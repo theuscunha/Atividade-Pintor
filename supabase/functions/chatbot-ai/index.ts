@@ -20,7 +20,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const GROQ_MODEL = "openai/gpt-oss-20b";
+const GROQ_MODEL = "openai/gpt-oss-120b";
 
 // Preços oficiais — espelho da tabela `precos` e do SQL seed.
 // A function calcular usa exatamente estes números.

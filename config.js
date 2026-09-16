@@ -26,5 +26,5 @@ const CONFIG = {
 
   // --- IA Groq via Edge Function chatbot-ai (item e da atividade) ---
   edgeChatUrl: "https://ybjqbblhmvvxtczeqpyb.supabase.co/functions/v1/chatbot-ai",
-  groqModel: "openai/gpt-oss-20b",
+  groqModel: "openai/gpt-oss-120b",
 };
