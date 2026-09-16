@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Pintor — Orçamentos recebidos</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .painel { max-width: 1020px; margin: 0 auto; padding: 20px; }
+    .cards-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+    .resumo { background: var(--card); border: 1px solid var(--borda); border-radius: 12px; padding: 14px; }
+    .resumo small { color: var(--muted); }
+    .resumo strong { display: block; font-size: 1.4rem; margin-top: 4px; }
+    .toolbar { display: flex; gap: 8px; margin: 12px 0; }
+    .toolbar input {
+      flex: 1; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--borda); font-size: .95rem;
+    }
+    table.leads { width: 100%; border-collapse: collapse; background: var(--card);
+      border: 1px solid var(--borda); border-radius: 12px; overflow: hidden; font-size: .88rem; }
+    table.leads th, table.leads td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--borda); }
+    table.leads th { color: var(--muted); font-size: .75rem; text-transform: uppercase; }
+    table.leads tr:last-child td { border-bottom: none; }
+    .valor { font-weight: 800; color: var(--primary-dark); white-space: nowrap; }
+    .vazio { text-align: center; color: var(--muted); padding: 26px; }
+    @media (max-width: 760px) { .cards-resumo { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <span class="logo">🎨 Pintor <small>painel de orçamentos</small></span>
+      <nav class="links"><a href="index.html">← Voltar ao site</a></nav>
+      <button id="btn-atualizar" class="btn btn-primary" type="button">Atualizar</button>
+    </div>
+  </header>
+
+  <main class="painel">
+    <div class="cards-resumo">
+      <div class="resumo"><small>Orçamentos recebidos</small><strong id="total-qtd">—</strong></div>
+      <div class="resumo"><small>Valor total (todos)</small><strong id="total-valor">—</strong></div>
+      <div class="resumo"><small>Este mês</small><strong id="total-mes">—</strong></div>
+    </div>
+
+    <div class="toolbar">
+      <input id="busca" type="search" placeholder="Buscar por nome, telefone ou serviço…" />
+    </div>
+
+    <table class="leads">
+      <thead>
+        <tr><th>#</th><th>Nome</th><th>Telefone</th><th>Serviço</th><th>Cômodos</th><th>Valor</th><th>Recebido em</th></tr>
+      </thead>
+      <tbody id="linhas"><tr><td colspan="7" class="vazio">Carregando…</td></tr></tbody>
+    </table>
+    <p id="erro" style="color:#b91c1c"></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const reais = (v) => "R$ " + Number(v).toFixed(2).replace(".", ",");
+    const dataBR = (iso) => new Date(iso).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" });
+    let todos = [];
+
+    async function carregar() {
+      $("erro").textContent = "";
+      $("linhas").innerHTML = '<tr><td colspan="7" class="vazio">Carregando…</td></tr>';
+      try {
+        const sb = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey);
+        const { data, error } = await sb.from(CONFIG.tabelaOrcamentos).select("*").order("criado_em", { ascending: false });
+        if (error) throw error;
+        todos = data || [];
+        renderizar($("busca").value);
+      } catch (e) {
+        $("linhas").innerHTML = '<tr><td colspan="7" class="vazio">Não consegui carregar.</td></tr>';
+        $("erro").textContent = "Erro: " + (e.message || e);
+      }
+    }
+
+    function renderizar(filtro) {
+      const f = (filtro || "").toLowerCase();
+      const lista = todos.filter((o) =>
+        !f || [o.nome, o.telefone, o.tipo_servico].some((c) => String(c || "").toLowerCase().includes(f))
+      );
+      const soma = (arr) => arr.reduce((s, o) => s + Number(o.valor_calculado || 0), 0);
+      const agora = new Date();
+      const doMes = todos.filter((o) => {
+        const d = new Date(o.criado_em);
+        return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+      });
+      $("total-qtd").textContent = todos.length;
+      $("total-valor").textContent = reais(soma(todos));
+      $("total-mes").textContent = doMes.length + " • " + reais(soma(doMes));
+      $("linhas").innerHTML = lista.length ? lista.map((o) =>
+        `<tr><td>${o.id}</td><td>${esc(o.nome)}</td><td>${esc(o.telefone)}</td>` +
+        `<td>${esc(o.tipo_servico)}${o.longe ? " + visita" : ""}</td><td>${o.quantidade_comodos}</td>` +
+        `<td class="valor">${reais(o.valor_calculado)}</td><td>${dataBR(o.criado_em)}</td></tr>`
+      ).join("") : '<tr><td colspan="7" class="vazio">Nenhum orçamento encontrado.</td></tr>';
+    }
+
+    const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    $("busca").addEventListener("input", (e) => renderizar(e.target.value));
+    $("btn-atualizar").addEventListener("click", carregar);
+    document.addEventListener("DOMContentLoaded", carregar);
+  </script>
+</body>
+</html>

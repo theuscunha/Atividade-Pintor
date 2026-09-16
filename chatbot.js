@@ -144,9 +144,10 @@ async function salvarOrcamento() {
     return j.lead || payload;
   }
   if (supabaseClient) {
+    const { nome, telefone, tipo_servico, quantidade_comodos, valor_calculado } = payload;
     const { data, error } = await supabaseClient
       .from(CONFIG.tabelaOrcamentos)
-      .insert([payload])
+      .insert([{ nome, telefone, tipo_servico, quantidade_comodos, valor_calculado }])
       .select();
     if (error) throw error;
     return data[0];

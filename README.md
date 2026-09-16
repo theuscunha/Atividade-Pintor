@@ -64,7 +64,7 @@ Aí o chat passa a calcular/salvar **no servidor**, e com `edgeChatUrl` preenchi
 - [ ] Segunda mensagem de outra IA para testar — **não feito** (roteiro pronto acima, é só colar outra mensagem e conferir os 3 valores).
 - [x] Taxa de visita R$ 30 — **implementada** (opt-in): `longe: true` soma R$ 30 no `calcular-orcamento`, `salvar-orcamento` e na tool da IA; o chat pergunta "o local é muito longe?" antes de aplicar, nunca assume. Padrão sem taxa = cálculo básico exato.
 - [x] Desconto automático — **implementado**: 10% sobre o serviço a partir de 5 cômodos (taxa de visita sem desconto). Ex.: 5 × lisa = 600 − 60 = 540.
-- [ ] Painel admin — **parcial**: `select * from orcamentos order by criado_em desc;` no SQL Editor já lista os leads; leads demo ficam em `localStorage.orcamentos_demo`.
+- [x] Painel admin — **implementado**: `admin.html` (tabela de leads com busca, totais e total do mês; link "Área do pintor" no rodapé do site).
 - [ ] Notificação Discord — **não implementada** (webhook no `salvar-orcamento` após insert).
 
 ## Estrutura
