@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pintor — Orçamento na Hora</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============ TOPO (logo + Home + Get in touch) ============ -->
+  <header class="nav">
+    <div class="nav-inner">
+      <span class="logo">🎨 Pintor <small>orçamento na hora</small></span>
+      <nav class="links">
+        <a href="#inicio">Início</a>
+        <a href="#servicos">Serviços</a>
+        <a href="#orcamento">Orçamento</a>
+      </nav>
+      <button class="btn btn-primary" type="button" data-scroll="#orcamento">Pedir orçamento</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERÓI (título + 2 botões + foto) ============ -->
+    <section id="inicio" class="hero">
+      <div class="hero-text">
+        <h1>Pintura de parede e teto sem enrolação</h1>
+        <p>Peça o valor aproximado na hora aqui no chat — sem calculadora, sem espera. O pintor liga depois para fechar.</p>
+        <div class="hero-btns">
+          <button class="btn btn-primary" type="button" data-scroll="#orcamento">Pedir orçamento</button>
+          <button class="btn btn-ghost" type="button" data-scroll="#servicos">Ver preços</button>
+        </div>
+      </div>
+      <div class="hero-photo" aria-hidden="true">
+        <span class="hero-emoji">👨‍🎨</span>
+        <div class="hero-card">
+          <strong>Orçamento na hora</strong>
+          <span>lisa R$ 120 • textura R$ 180 • teto R$ 100</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BLOCO DE SERVIÇOS (3 cards) ============ -->
+    <section id="servicos" class="servicos">
+      <p class="superscript">TABELA DE PREÇOS</p>
+      <h2>Nossos serviços</h2>
+      <p class="block-desc">Preço por cômodo, igual ao que o pintor cobra. Escolha um e o chat já começa com ele.</p>
+
+      <div class="cards">
+        <article class="card">
+          <div class="card-photo">🧱</div>
+          <p class="category">Parede</p>
+          <h3>Parede lisa</h3>
+          <p class="card-desc"><strong>R$ 120</strong> por cômodo. Acabamento liso tradicional.</p>
+          <button class="btn btn-primary" type="button" data-service="parede lisa">Quero este</button>
+        </article>
+
+        <article class="card">
+          <div class="card-photo">🧽</div>
+          <p class="category">Parede</p>
+          <h3>Parede com textura</h3>
+          <p class="card-desc"><strong>R$ 180</strong> por cômodo. Dá mais trabalho, efeito decorativo.</p>
+          <button class="btn btn-primary" type="button" data-service="parede com textura">Quero este</button>
+        </article>
+
+        <article class="card">
+          <div class="card-photo">🏠</div>
+          <p class="category">Teto</p>
+          <h3>Teto</h3>
+          <p class="card-desc"><strong>R$ 100</strong> por cômodo. Pintura de teto completa.</p>
+          <button class="btn btn-primary" type="button" data-service="teto">Quero este</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ CALL TO ACTION + CHAT ============ -->
+    <section id="orcamento" class="orcamento">
+      <h2>Peça seu orçamento no chat</h2>
+      <p class="block-desc">O <strong>valor calculado aparece em destaque</strong> e, ao salvar, você vê a <strong>confirmação com o protocolo</strong>. <span id="modo-badge" class="badge">modo demonstração</span></p>
+
+      <div class="chat-wrap">
+        <section id="chat-messages" class="chat" aria-live="polite"></section>
+        <div id="quick-replies" class="quick"></div>
+        <form id="chat-form" class="entrada" autocomplete="off">
+          <input id="chat-input" type="text" placeholder="Digite aqui… (ex.: 2 cômodos de parede lisa)" maxlength="300" />
+          <button id="btn-send" type="submit">Enviar</button>
+        </form>
+        <div class="chat-foot">
+          <small>Taxa de visita de R$ 30 só se o local for muito longe. 📞</small>
+          <button id="btn-recomecar" type="button">🔄 Recomeçar</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>🎨 Pintor — Orçamento na Hora • Feito para a atividade do SENAI</small>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="chatbot.js"></script>
+</body>
+</html>
