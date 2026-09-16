@@ -1,6 +1,7 @@
 # 🎨 Orçamento na Hora — Pintor autônomo
 
 > Repositório: https://github.com/theuscunha/Atividade-Pintor
+> Site publicado: https://atividade-pintor.pages.dev/
 
 Chat que dá o valor aproximado na hora e salva o contato (lead) para o pintor ligar depois.
 
