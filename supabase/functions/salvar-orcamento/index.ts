@@ -19,6 +19,7 @@ const PRECOS: Record<string, number> = {
 };
 
 // Desafio extra: taxa de visita de R$ 30, só quando `longe === true`.
+// Desafio extra: desconto automático de 10% a partir de 5 cômodos (sobre o serviço).
 
 function normalizarTipo(raw: string): string | null {
   const t = (raw || "").toLowerCase().trim();
@@ -76,8 +77,10 @@ serve(async (req: Request) => {
     }
 
     // Recalcula no servidor — o valor que vale é o da tabela oficial
-    // (+ R$ 30 de visita somente se longe === true).
-    const valor_calculado = PRECOS[tipo] * qtd + (longe ? 30 : 0);
+    // (+ R$ 30 de visita somente se longe === true; −10% a partir de 5 cômodos).
+    const subtotal = PRECOS[tipo] * qtd;
+    const desconto = qtd >= 5 ? subtotal * 0.10 : 0;
+    const valor_calculado = subtotal - desconto + (longe ? 30 : 0);
 
     const url = Deno.env.get("SUPABASE_URL");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");

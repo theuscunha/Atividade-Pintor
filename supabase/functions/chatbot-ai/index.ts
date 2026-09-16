@@ -38,6 +38,7 @@ TABELA DE PREÇOS (por cômodo — NUNCA mude estes valores):
 - teto: R$ 100
 NÃO existe desconto. Cálculo básico = preço unitário x quantidade de cômodos.
 TAXA DE VISITA (desafio extra): R$ 30, aplicada SOMENTE se o cliente confirmar que o local é muito longe. Padrão: sem taxa. Se o cliente não disser nada sobre distância, calcule sem a taxa e pergunte se o local é longe antes de salvar — nunca assuma.
+DESCONTO AUTOMÁTICO (desafio extra): 10% sobre o subtotal do serviço a partir de 5 cômodos (a taxa de visita não tem desconto). Aplique sempre, sem perguntar, e avise o cliente. Ex.: 5 × parede lisa = 600 − 60 = 540.
 
 COMO AGIR (use as ferramentas, nunca calcule de cabeça no texto):
 1. Para ORÇAR você precisa de 2 dados: tipo_servico (um dos 3 acima) e quantidade_comodos (inteiro > 0).
@@ -120,7 +121,8 @@ async function salvarLead(
   if (dig.length < 10 || dig.length > 11) {
     return { ok: false, erro: "Telefone inválido — peça o WhatsApp com DDD." };
   }
-  const valor_calculado = PRECOS[tipo] * qtd + (longe ? 30 : 0);
+  const subtotalLead = PRECOS[tipo] * qtd;
+  const valor_calculado = subtotalLead - (qtd >= 5 ? subtotalLead * 0.10 : 0) + (longe ? 30 : 0);
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY");
   if (!url || !key) {
@@ -224,12 +226,16 @@ serve(async (req: Request) => {
           if (!tipo || !Number.isInteger(qtd) || qtd <= 0) {
             result = { ok: false, erro: "Faltam tipo_servico válido e quantidade_comodos > 0." };
           } else {
-            valor_calculado = PRECOS[tipo] * qtd + (longe ? 30 : 0);
+            const subtotal = PRECOS[tipo] * qtd;
+            const desconto = qtd >= 5 ? subtotal * 0.10 : 0;
+            valor_calculado = subtotal - desconto + (longe ? 30 : 0);
             result = {
               ok: true,
               tipo_servico: tipo,
               preco_unitario: PRECOS[tipo],
               quantidade_comodos: qtd,
+              subtotal,
+              desconto,
               longe,
               taxa_visita: longe ? 30 : 0,
               valor_total: valor_calculado,

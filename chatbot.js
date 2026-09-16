@@ -18,6 +18,7 @@ const els = {
 
 const TIPOS = CONFIG.tiposServico;
 const TAXA_VISITA = 30; // desafio extra: só quando o local é muito longe
+const DESCONTO_QTD_MIN = 5, DESCONTO_PCT = 10; // desafio extra: 10% a partir de 5 cômodos
 const state = { tipo: "", qtd: 0, longe: false, valor: 0, nome: "", telefone: "" };
 let etapa = "tipo";           // tipo -> qtd -> longe -> nome -> telefone -> fim
 let historicoIA = [];         // usado só no modo IA
@@ -106,7 +107,8 @@ async function calcularOrcamento(tipo, qtd, longe = false) {
     if (j.erro) throw new Error(j.erro);
     return j.valor_total;
   }
-  return calcularLocal(tipo, qtd) + (longe ? TAXA_VISITA : 0);
+  const subtotal = calcularLocal(tipo, qtd);
+  return subtotal - (qtd >= DESCONTO_QTD_MIN ? subtotal * (DESCONTO_PCT / 100) : 0) + (longe ? TAXA_VISITA : 0);
 }
 
 function salvarDemo(lead) {
@@ -223,7 +225,7 @@ async function tratarGuiado(textoOriginal) {
     }
     // f) mostra o valor calculado em destaque
     addMsg(
-      `💰 Orçamento: <strong>${esc(reais(state.valor))}</strong><br><span style="font-size:.85rem">${esc(String(state.qtd))} × ${esc(state.tipo)} (${esc(reais(CONFIG.precos[state.tipo]))}/cômodo)</span>`,
+      `💰 Orçamento: <strong>${esc(reais(state.valor))}</strong><br><span style="font-size:.85rem">${esc(String(state.qtd))} × ${esc(state.tipo)} (${esc(reais(CONFIG.precos[state.tipo]))}/cômodo)${state.qtd >= DESCONTO_QTD_MIN ? ` — com ${DESCONTO_PCT}% de desconto` : ""}</span>`,
       "bot", "valor", true
     );
     etapa = "longe";

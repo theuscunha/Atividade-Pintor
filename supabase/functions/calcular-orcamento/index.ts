@@ -16,6 +16,10 @@ const corsHeaders = {
 // o cliente confirma que o local é muito longe (flag `longe`).
 // Padrão: false → cálculo básico exato (critério crítico b intacto).
 const TAXA_VISITA = 30;
+// Desafio extra: desconto automático de 10% a partir de 5 cômodos,
+// aplicado sobre o subtotal do serviço (a taxa de visita não tem desconto).
+const DESCONTO_QTD_MIN = 5;
+const DESCONTO_PCT = 10;
 const PRECOS: Record<string, number> = {
   "parede lisa": 120,
   "parede com textura": 180,
@@ -65,11 +69,13 @@ serve(async (req: Request) => {
     }
 
     const preco_unitario = PRECOS[tipo];
+    const subtotal = preco_unitario * qtd;
+    const desconto = qtd >= DESCONTO_QTD_MIN ? subtotal * (DESCONTO_PCT / 100) : 0;
     const taxa_visita = longe ? TAXA_VISITA : 0;
-    const valor_total = preco_unitario * qtd + taxa_visita;
+    const valor_total = subtotal - desconto + taxa_visita;
 
     return new Response(
-      JSON.stringify({ tipo_servico: tipo, preco_unitario, quantidade_comodos: qtd, longe, taxa_visita, valor_total }),
+      JSON.stringify({ tipo_servico: tipo, preco_unitario, quantidade_comodos: qtd, subtotal, desconto, longe, taxa_visita, valor_total }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch {
